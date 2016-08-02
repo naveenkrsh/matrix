@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.css" media="screen,projection" />
+    <style type="text/css">
+    .border {
+        border: 1px solid;
+    }
+    
+    .cell {
+        text-align: center;
+        vertical-align: middle border: 1px solid;
+    }
+    
+    .remove-bottom-margin {
+        margin-bottom: 0px;
+    }
+    </style>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Page Content goes here -->
+        <div id="game_grid"></div>
+    </div>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
+    <script type="text/javascript" src="Matrix.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+    <script type="text/javascript">
+    (function() {
+
+        var Game = function(container_id) {
+
+            this.boardElem = $(container_id);
+            this.board = new Lava();
+            //console.log(this.board);
+            this.init();
+
+            console.log(this.board.current_empty);
+        }
+
+
+        Game.keycodes = {
+            LEFT: {
+                '37': 1
+            },
+            UP: {
+                '38': 1
+            },
+            RIGHT: {
+                '39': 1
+            },
+            DOWN: {
+                '40': 1
+            }
+        }
+
+        Game.events = {
+            KEYDOWN: 'keydown',
+            KEYUP: 'keyup',
+            RESIZE: 'resize',
+            LOAD: 'load'
+        };
+        Game.prototype.init = function() {
+
+            var size = this.board.size;
+            var box_size = this.getBoxSize();
+
+            for (var i = 0; i < size; i++) {
+                var str = '<div class="row remove-bottom-margin">'
+
+                for (var j = 0; j < size; j++) {
+
+                    str += '<div class="col s1 center-align cell blue-text text-darken-2 border" id="cell-' + i.toString() +'-'+ j.toString() + '" style="width:' + box_size + 'px;height:' + box_size + 'px;line-height: ' + box_size + 'px;">';
+                    // str += '<span class="center-align">' + this.board.out.get(i, j).d + '</span>'
+                    str += this.board.out.get(i, j).d;
+                    str += '</div>'
+                }
+                str += '</div>';
+                this.boardElem.append(str);
+            }
+
+
+            this.startListening();
+        };
+        Game.prototype.handleEvent = function(e) {
+            return (function(evtType, events) {
+                switch (evtType) {
+                    case events.KEYDOWN:
+                        this.onKeyDown(e);
+                        break;
+
+                }
+            }.bind(this))(e.type, Game.events);
+        };
+        Game.prototype.startListening = function() {
+            // Keys.
+            document.addEventListener(Game.events.KEYDOWN, this);
+            //document.addEventListener(Game.events.KEYUP, this);
+        };
+
+        Game.prototype.onKeyDown = function(e) {
+
+            var pos = this.board.current_empty;
+            var x = pos.x;
+            var y = pos.y;
+            if (Game.keycodes.LEFT[e.keyCode]) {
+
+                if (this.board.move["Right"]()) {
+                    this.board.display(this.board.out);
+                    this.updateUI(x, y);
+                }
+            }
+
+            if (Game.keycodes.UP[e.keyCode]) {
+                if (this.board.move["Down"]()) {
+                    this.board.display(this.board.out);
+                    this.updateUI(x, y);
+                }
+            }
+
+            if (Game.keycodes.RIGHT[e.keyCode]) {
+                if (this.board.move["Left"]()) {
+                    this.board.display(this.board.out);
+                    this.updateUI(x, y);
+                }
+            }
+
+            if (Game.keycodes.DOWN[e.keyCode]) {
+                if (this.board.move["Up"]()) {
+                    this.board.display(this.board.out);
+                    this.updateUI(x, y);
+                }
+            }
+
+        };
+        Game.prototype.updateUI = function(x, y) {
+            var elem1 = '#cell-' + x.toString() +'-'+ y.toString();
+            $(elem1).text(this.board.out.get(x, y).d);
+            var pos = this.board.current_empty;
+            var elem2 = '#cell-' + pos.x.toString() +'-'+ pos.y.toString();
+            $(elem2).text(this.board.out.get(pos.x, pos.y).d);
+
+        };
+        Game.prototype.getBoxSize = function() {
+
+            var window_height = window.innerHeight;
+            var gameWidth = this.boardElem.offsetWidth;
+
+            if (gameWidth < window_height) {
+                return Math.ceil((Math.ceil(gameWidth) - 20) / this.board.size);
+            } else {
+                return Math.ceil((Math.ceil(window_height) - 20) / this.board.size);
+            }
+        }
+
+
+        var game = new Game('#game_grid');
+
+    })();
+    </script>
+</body>
+
+</html>

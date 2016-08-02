@@ -27,7 +27,7 @@
     };
     Matrix.prototype.get = function(i, j) {
 
-       return this.data[this.getIndex(i, j)];
+        return this.data[this.getIndex(i, j)];
     };
     Matrix.prototype.isEqual = function(matrix) {
         if (matrix.size != this.size)
@@ -40,8 +40,22 @@
         return true;
     };
 
+    Matrix.prototype.getSeq = function(index) {
 
-    module.exports = Matrix;
+        if (index > this.size - 1) {
+
+            throw new Error("Index out of bound");
+        }
+
+        return this.data[index];
+    }
+
+    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
+        module.exports = Matrix;
+    else
+        window.Matrix = Matrix;
+
+
 
 })();
 

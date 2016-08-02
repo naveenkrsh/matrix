@@ -1,0 +1,20 @@
+{
+  "name": "Matrix",
+  "main": "Matrix.js",
+  "authors": [
+    "Naveen <naveen.kr.sh1993@gmail.com>"
+  ],
+  "description": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "materialize": "^0.97.7"
+  }
+}

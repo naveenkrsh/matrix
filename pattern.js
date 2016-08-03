@@ -12,9 +12,23 @@
         this.init();
 
         //console.log(this.board.current_empty);
-        this.autoPlay();
+        //this.autoPlay();
+        this.gameOver();
     }
 
+    Game.gameOverModel = {
+        id: "game-over-model",
+        html: '<!-- Modal Structure -->\
+                <div id="game-over-model" class="modal">\
+                    <div class = "modal-content" >\
+                        <h4> Modal Header </h4>\
+                        <p> A bunch of text </p>\
+                    </div>\
+                    <div class = "modal-footer" >\
+                        <a href = "#!" class = " modal-action modal-close waves-effect waves-green btn-flat" > Agree </a>\
+                    </div>\
+                </div>'
+    }
 
     Game.keycodes = {
         LEFT: {
@@ -39,6 +53,7 @@
     };
     Game.prototype.init = function() {
         this.drawBoard();
+        this.insertGameOverModel();
         this.startListening();
         this.setBestSwap();
     };
@@ -68,6 +83,10 @@
             this.boardElem.append(str);
         }
     };
+
+    Game.prototype.insertGameOverModel = function() {
+        $('body').append(Game.gameOverModel.html);
+    }
 
     Game.prototype.handleEvent = function(e) {
         return (function(evtType, events) {
@@ -167,29 +186,29 @@
             var x = pos.x;
             var y = pos.y;
             var move = that.board.moveHistory.pop();
-            that.board.display(that.board.out);
+            //that.board.display(that.board.out);
             that.board.move[move.opp]();
-            that.board.display(that.board.out);
+            //that.board.display(that.board.out);
             that.current_swap++;
             that.updateUI(x, y);
             play();
         }
 
         //move();
-        function play()
-        {
-            if(that.board.moveHistory.length >0)
+        function play() {
+            if (that.board.moveHistory.length > 0)
                 setTimeout(move, 1000);
         }
 
         play();
     }
 
-    Game.prototype.gameOver = function()
-    {
-
+    Game.prototype.gameOver = function() {
+        $('#' + Game.gameOverModel.id).openModal();
     }
-    
+
+
+
     Game.prototype.reSuffle = function() {
         // body...
     };

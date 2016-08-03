@@ -58,27 +58,3 @@
 
 
 })();
-
-
-/*
-var ma = new Matrix(3, 3);
-
-var v = 0;
-for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
-        ma.set(i, j, v++);
-    }
-}
-
-var mb = new Matrix(3, 3);
-v = 0;
-for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
-        mb.set(i, j, v++);
-    }
-}
-
-var va = ma.isEqual(mb);
-
-console.log(va);
-*/

@@ -185,7 +185,17 @@
         play();
     }
 
+    Game.prototype.gameOver = function()
+    {
+
+    }
     
+    Game.prototype.reSuffle = function() {
+        // body...
+    };
+    Game.prototype.reset = function() {
+        // body...
+    };
 
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
         module.exports = Game;

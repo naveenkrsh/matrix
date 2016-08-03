@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.css" media="screen,projection" />
+    <style type="text/css">
+    .border {
+        border: 1px solid;
+    }
+    
+    .cell {
+        text-align: center;
+        vertical-align: middle border: 1px solid;
+    }
+    
+    .remove-bottom-margin {
+        margin-bottom: 0px;
+    }
+    /* .container .row.remove-margin {
+        margin-left: 0rem;
+        margin-right: 0rem;
+    }*/
+    </style>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Page Content goes here -->
+        <div class="row remove-margin">
+            <div class="col s12 m9" style="padding:0px">
+                <div id="game_grid" class=""></div>
+            </div>
+            <div class="col s12 m3">
+                <ul class="collection">
+                    <li href="#!" class="collection-item">Best Swap <span class="badge" id="best_swaps"></span></a>
+                        <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
+                </ul>
+                <!-- <div id="" class=" ">
+                </div>
+                <div id=""></div> -->
+            </div>
+        </div>
+    </div>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
+    <script type="text/javascript" src="Matrix.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+    <script type="text/javascript" src="pattern.js"></script>
+    <script type="text/javascript" src="color.js"></script>
+    <script type="text/javascript">
+    (function() {
+
+
+
+        function NumberGame() {
+            this.size = 4;
+            this.input = this.setInput();
+            this.game = new Game({
+                board_id: 'game_grid',
+                best_swaps: 'best_swaps',
+                current_swaps: 'current_swaps'
+            }, this.input, this.size);
+        }
+
+        NumberGame.prototype.setInput = function() {
+            var ma = new Matrix(this.size, this.size);
+
+            var color_size = COLORS.length;
+
+            var v = 1;
+            for (var i = 0; i < this.size; i++) {
+                for (var j = 0; j < this.size; j++) {
+                    var color_index = Math.floor(Math.random() * (color_size - 1));
+                    ma.set(i, j, {
+                        v: v,
+                        d: v,
+                        c: COLORS[color_index]
+                    });
+                    v++;
+                }
+            }
+            //console.log(this.empty);
+            //ma.set(this.size - 1, this.size - 1, this.empty);
+
+            //console.log(ma.data);
+            return ma;
+        };
+
+        new NumberGame();
+
+    })();
+    </script>
+</body>
+
+</html>

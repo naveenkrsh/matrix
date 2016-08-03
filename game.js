@@ -4,18 +4,21 @@ if (typeof require !== 'undefined')
 (function(Matrix) {
     'use strict';
 
-    function Lava() {
-        this.size = 12;
-        this.empty = { v: -1, d: " " };
+    function Lava(input, size) {
+        this.size = size;
+        this.empty = { v: -1, d: " ", c: '#FFFFFF' };
         this.current_empty = {
             x: this.size - 1,
             y: this.size - 1
         };
         this.sufflefreq = [0.8, 1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5, 2.9];
+        this.minimum_swap = 0;
+        this.swap_count = 0;
         this.gameStateHistory = [];
         this.moveHistory = [];
         this.move = this.getMove();
-        this.input = this.setInput();
+        this.input = input; //this.setInput();
+        this.setEmpty(this.input);
         this.out = [];
         this.suffle();
 
@@ -37,8 +40,9 @@ if (typeof require !== 'undefined')
                 }
                 that.out.set(x, y, that.out.get(--x, y));
                 that.current_empty.x--;
-                that.setEmpty();
-                console.log('up')
+                that.swap_count++;
+                that.setEmpty(that.out);
+                //console.log('up')
                 return true;
             },
             Down: function() {
@@ -50,8 +54,9 @@ if (typeof require !== 'undefined')
                 }
                 that.out.set(x, y, that.out.get(++x, y));
                 that.current_empty.x++;
-                that.setEmpty();
-                console.log('down')
+                that.swap_count++;
+                that.setEmpty(that.out);
+                //console.log('down')
                 return true;
             },
             Left: function() {
@@ -63,8 +68,9 @@ if (typeof require !== 'undefined')
                 }
                 that.out.set(x, y, that.out.get(x, --y));
                 that.current_empty.y--;
-                that.setEmpty();
-                console.log('left');
+                that.swap_count++;
+                that.setEmpty(that.out);
+                //console.log('left');
                 return true;
             },
             Right: function() {
@@ -76,16 +82,17 @@ if (typeof require !== 'undefined')
                 }
                 that.out.set(x, y, that.out.get(x, ++y));
                 that.current_empty.y++;
-                that.setEmpty();
-                console.log('Right')
+                that.swap_count++;
+                that.setEmpty(that.out);
+                //console.log('Right')
 
                 return true;
             }
         };
     }
 
-    Lava.prototype.setEmpty = function() {
-        this.out.set(this.current_empty.x, this.current_empty.y, this.empty);
+    Lava.prototype.setEmpty = function(matrix) {
+        matrix.set(this.current_empty.x, this.current_empty.y, this.empty);
     }
     Lava.prototype.setInput = function() {
         var ma = new Matrix(this.size, this.size);
@@ -138,15 +145,16 @@ if (typeof require !== 'undefined')
                 this.move[last_move.opp]();
             } else {
                 this.moveHistory.push(last_move);
-                var game_state = JSON.stringify(this.out.data);
+                var game_state = JSON.stringify(this.out);
+                console.log(" game_state instanceof Matrix ", game_state instanceof Matrix  );
                 this.gameStateHistory.push(JSON.parse(game_state));
                 total_swap++;
             }
             //this.display(this.out);
         }
-        console.log("No of suffle_no :" + suffle_no);
-        console.log("No of swap :" + total_swap);
-
+        //console.log("No of suffle_no :" + suffle_no);
+        //console.log("No of swap :" + total_swap);
+        this.minimum_swap = total_swap;
         this.gameStateHistory = [];
     };
 
@@ -177,9 +185,11 @@ if (typeof require !== 'undefined')
         for (var i = 0; i < this.gameStateHistory.length; i++) {
             isFound = true;
             for (var j = 0; j < this.out.data.length; j++) {
-                if (this.gameStateHistory[i][j].v != this.out.data[j].v) {
+                /*if (this.gameStateHistory[i][j].v != this.out.data[j].v) {
                     isFound = false;
-                }
+                }*/
+
+               isFound=this.out.isEqual(this.gameStateHistory[i]);
             }
 
             if (isFound)
@@ -220,6 +230,10 @@ if (typeof require !== 'undefined')
         console.log("********End*********");
     }
 
+    Lava.prototype.isGameOver= function()
+    {
+        return this.out.isEqual(this.input);
+    }
 
     //var l = new Lava();
 

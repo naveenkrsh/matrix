@@ -1,34 +1,29 @@
 (function(Lava) {
-
+    var event = new Event('gameOver');
     var Game = function(container_ids, input, size) {
 
         this.elem = container_ids
-
+        this.input = input;
+        this.size = size;
         this.boardElem = $('#' + this.elem.board_id);
-        this.board = new Lava(input, size);
-        this.minimum_swap = this.board.minimum_swap;
+        this.board = new Lava(this.input, this.size);
         this.current_swap = 0;
         //console.log(this.board);
         this.init();
 
+        this.gameOverModel = {
+            new_game: 'modal-new-game',
+            
+        }
+
+        this.isAuto = false;
+
         //console.log(this.board.current_empty);
-        //this.autoPlay();
-        this.gameOver();
+        this.autoPlay();
+        //this.gameOver();
     }
 
-    Game.gameOverModel = {
-        id: "game-over-model",
-        html: '<!-- Modal Structure -->\
-                <div id="game-over-model" class="modal">\
-                    <div class = "modal-content" >\
-                        <h4> Modal Header </h4>\
-                        <p> A bunch of text </p>\
-                    </div>\
-                    <div class = "modal-footer" >\
-                        <a href = "#!" class = " modal-action modal-close waves-effect waves-green btn-flat" > Agree </a>\
-                    </div>\
-                </div>'
-    }
+
 
     Game.keycodes = {
         LEFT: {
@@ -58,7 +53,7 @@
         this.setBestSwap();
     };
     Game.prototype.setBestSwap = function() {
-        $('#' + this.elem.best_swaps).text(this.minimum_swap);
+        $('#' + this.elem.best_swaps).text(this.board.minimum_swap);
     }
     Game.prototype.drawBoard = function() {
         var size = this.board.size;
@@ -82,11 +77,26 @@
 
             this.boardElem.append(str);
         }
+        $('#' + this.elem.current_swaps).text(this.current_swap);
     };
-
+    Game.gameOverModel = {
+        id: "game-over-model",
+        html: '<!-- Modal Structure -->\
+                <div id="game-over-model" class="modal">\
+                    <div class = "modal-content" >\
+                        <h4> Game Over </h4>\
+                        <p> Congrats!!!!!!!! </p>\
+                        <div class="my-rating"></div>\
+                    </div>\
+                    <div class = "modal-footer" >\
+                        <button id="modal-new-game" class = " modal-action modal-close waves-effect waves-green btn-flat btn" ><i class="material-icons left">restore</i> New Game </button>\
+                        <button class = " modal-action modal-close waves-effect waves-green btn-flat btn" ><i class="material-icons left">repeat</i> Replay </button>\
+                    </div>\
+                </div>'
+    };
     Game.prototype.insertGameOverModel = function() {
         $('body').append(Game.gameOverModel.html);
-    }
+    };
 
     Game.prototype.handleEvent = function(e) {
         return (function(evtType, events) {
@@ -105,6 +115,15 @@
         document.addEventListener(Game.events.KEYDOWN, this);
         //document.addEventListener(Game.events.KEYUP, this);
         window.addEventListener(Game.events.RESIZE, this);
+
+
+
+        $(document).on('gameOver', $.proxy(this.gameOver, this));
+        //document.addEventListener('gameOver', (function(this){function (e) { console.log('hr')}})(this), false);
+
+        // Dispatch the event.
+        //document.dispatchEvent(event);
+
     };
 
     Game.prototype.onKeyDown = function(e) {
@@ -117,6 +136,7 @@
             if (this.board.move["Right"]()) {
                 this.current_swap++;
                 //this.board.display(this.board.out);
+                this.isGameOver();
                 this.updateUI(x, y);
             }
         }
@@ -124,6 +144,8 @@
         if (Game.keycodes.UP[e.keyCode]) {
             if (this.board.move["Down"]()) {
                 this.current_swap++;
+                this.isGameOver();
+
                 //this.board.display(this.board.out);
                 this.updateUI(x, y);
             }
@@ -132,6 +154,8 @@
         if (Game.keycodes.RIGHT[e.keyCode]) {
             if (this.board.move["Left"]()) {
                 this.current_swap++;
+                this.isGameOver();
+
                 //this.board.display(this.board.out);
                 this.updateUI(x, y);
             }
@@ -140,6 +164,8 @@
         if (Game.keycodes.DOWN[e.keyCode]) {
             if (this.board.move["Up"]()) {
                 this.current_swap++;
+                this.isGameOver();
+
                 //this.board.display(this.board.out);
                 this.updateUI(x, y);
             }
@@ -179,6 +205,8 @@
 
     Game.prototype.autoPlay = function() {
 
+        this.isAuto = true;
+        //return;
         var that = this;
         //
         function move() {
@@ -186,47 +214,83 @@
             var x = pos.x;
             var y = pos.y;
             var move = that.board.moveHistory.pop();
+
             //that.board.display(that.board.out);
             that.board.move[move.opp]();
             //that.board.display(that.board.out);
             that.current_swap++;
             that.updateUI(x, y);
+            that.isGameOver();
             play();
         }
 
         //move();
         function play() {
-            if (that.board.moveHistory.length > 0)
+            if (that.board.moveHistory.length > 0 && that.isAuto) {
                 setTimeout(move, 1000);
+            }
         }
 
         play();
     }
 
     Game.prototype.gameOver = function() {
-        $('#' + Game.gameOverModel.id).openModal();
+
+        $(".my-rating").starRating({
+            initialRating: 3.5,
+            readOnly: true,
+            starSize: 25
+        });
+        $('#' + Game.gameOverModel.id).openModal({
+            dismissible: false
+        });
     }
 
 
 
     Game.prototype.reSuffle = function() {
-        // body...
+
+        this.isAuto = false;
+        this.board.reSuffle();
+        this.current_swap = 0;
+        this.drawBoard();
+        this.setBestSwap();
+        var that = this;
+        setTimeout(function() {
+            that.autoPlay();
+        }, 1000);
+
+
+        //console.log(this.board);
+
+        console.log('reSuffle');
     };
     Game.prototype.reset = function() {
-        // body...
+        this.isAuto = false;
+        this.board.reset();
+        this.current_swap = 0;
+        this.drawBoard();
+        var that = this;
+        setTimeout(function() {
+            that.autoPlay();
+        }, 1000);
+        console.log('reset');
+    };
+
+    Game.prototype.setInput = function(input) {
+        this.input = input;
+        this.board.setInput(input);
+    }
+
+    Game.prototype.isGameOver = function() {
+
+        if (this.board.isGameOver())
+            document.dispatchEvent(event);
     };
 
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
         module.exports = Game;
     else
         window.Game = Game;
-
-    function OnDOMContentLoaded() {
-
-    }
-
-    function onResize() {
-
-    }
 
 })(Lava);

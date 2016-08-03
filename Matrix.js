@@ -49,6 +49,15 @@
 
         return this.data[index];
     }
+    Matrix.prototype.clone = function() {
+        var obj = this;
+        if (null == obj || "object" != typeof obj) return obj;
+        var copy = obj.constructor();
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+        }
+        return copy;
+    }
 
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
         module.exports = Matrix;

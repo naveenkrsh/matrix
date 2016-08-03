@@ -6,6 +6,7 @@
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="lib/jquery.star-rating/css/star-rating-svg.css" media="screen,projection" />
     <style type="text/css">
     .border {
         border: 1px solid;
@@ -23,6 +24,10 @@
         margin-left: 0rem;
         margin-right: 0rem;
     }*/
+    
+    .full-width {
+        width: 100%;
+    }
     </style>
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,6 +45,10 @@
                     <li href="#!" class="collection-item">Best Swap <span class="badge" id="best_swaps"></span></a>
                         <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
                 </ul>
+                <button id="new-game" class="waves-effect waves-light btn full-width red"><i class="material-icons left">replay</i>New Game</button>
+                <br>
+                <br>
+                <button id="reset" class="waves-effect waves-light btn full-width"><i class="material-icons left">restore</i>Reset</button>
                 <!-- <div id="" class=" ">
                 </div>
                 <div id=""></div> -->
@@ -49,6 +58,7 @@
     <!--Import jQuery before materialize.js-->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
+    <script type="text/javascript" src="lib/jquery.star-rating/jquery.star-rating-svg.js"></script>
     <script type="text/javascript" src="Matrix.js"></script>
     <script type="text/javascript" src="game.js"></script>
     <script type="text/javascript" src="pattern.js"></script>
@@ -60,15 +70,22 @@
 
         function NumberGame() {
             this.size = 4;
-            this.input = this.setInput();
+            this.input = this.getInput();
             this.game = new Game({
                 board_id: 'game_grid',
                 best_swaps: 'best_swaps',
-                current_swaps: 'current_swaps'
+                current_swaps: 'current_swaps',
+                reset: 'reset',
+                new_game: 'new-game'
             }, this.input, this.size);
+
+
+            this.startListening();
+
+            //console.log(this.game);
         }
 
-        NumberGame.prototype.setInput = function() {
+        NumberGame.prototype.getInput = function() {
             var ma = new Matrix(this.size, this.size);
 
             var color_size = COLORS.length;
@@ -91,7 +108,23 @@
             //console.log(ma.data);
             return ma;
         };
+        NumberGame.prototype.startListening = function() {
+            //$("#" + this.elem.reset).click($.proxy(this.reset, this));
+            $("#new-game").click($.proxy(this.newGame, this));
+            $("#" + this.game.gameOverModel.new_game).click($.proxy(this.newGame, this));
 
+             $("#reset").click($.proxy(this.reset, this));
+        };
+
+        NumberGame.prototype.newGame = function() {
+            this.game.setInput(this.getInput());
+            this.game.reSuffle();
+
+        };
+
+        NumberGame.prototype.reset = function() {
+            this.game.reset();
+        };
         new NumberGame();
 
     })();

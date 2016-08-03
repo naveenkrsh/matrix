@@ -4,6 +4,40 @@ if (typeof require !== 'undefined')
 (function(Matrix) {
     'use strict';
 
+    function clone(obj) {
+        var copy;
+
+        // Handle the 3 simple types, and null or undefined
+        if (null == obj || "object" != typeof obj) return obj;
+
+        // Handle Date
+        if (obj instanceof Date) {
+            copy = new Date();
+            copy.setTime(obj.getTime());
+            return copy;
+        }
+
+        // Handle Array
+        if (obj instanceof Array) {
+            copy = [];
+            for (var i = 0, len = obj.length; i < len; i++) {
+                copy[i] = clone(obj[i]);
+            }
+            return copy;
+        }
+
+        // Handle Object
+        if (obj instanceof Object) {
+            copy = {};
+            for (var attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+            }
+            return copy;
+        }
+
+        throw new Error("Unable to copy obj! Its type isn't supported.");
+    }
+
     function Lava(input, size) {
         this.size = size;
         this.empty = { v: -1, d: " ", c: '#FFFFFF' };
@@ -20,6 +54,7 @@ if (typeof require !== 'undefined')
         this.input = input; //this.setInput();
         this.setEmpty(this.input);
         this.out = [];
+        this.gameBackUp = {};
         this.suffle();
 
         this.display(this.input);
@@ -110,6 +145,18 @@ if (typeof require !== 'undefined')
         return ma;
     }
 
+    Lava.prototype.reSuffle = function() {
+        this.current_empty = {
+            x: this.size - 1,
+            y: this.size - 1
+        };
+        this.setEmpty(this.input);
+        this.minimum_swap = 0;
+        this.swap_count = 0;
+        this.moveHistory = [];
+        this.suffle();
+    }
+
     Lava.prototype.suffle = function() {
         var matrix = new Matrix(this.size, this.size);
         matrix.create(this.input.data);
@@ -146,16 +193,20 @@ if (typeof require !== 'undefined')
             } else {
                 this.moveHistory.push(last_move);
                 var game_state = JSON.stringify(this.out);
-                console.log(" game_state instanceof Matrix ", game_state instanceof Matrix  );
+                //console.log(" game_state instanceof Matrix ", game_state instanceof Matrix);
                 this.gameStateHistory.push(JSON.parse(game_state));
                 total_swap++;
             }
             //this.display(this.out);
         }
-        //console.log("No of suffle_no :" + suffle_no);
-        //console.log("No of swap :" + total_swap);
+        console.log("No of suffle_no :" + suffle_no);
+        console.log("No of swap :" + total_swap);
         this.minimum_swap = total_swap;
         this.gameStateHistory = [];
+        this.gameBackUp.data = $.extend(true, {}, this.out);
+        //clone(this.out); //this.out.clone(); //JSON.parse(JSON.stringify(this.out));
+        this.gameBackUp.empty = $.extend({},this.current_empty);
+        this.gameBackUp.moveHistory = JSON.parse(JSON.stringify(this.moveHistory));
     };
 
     Lava.prototype.getValidMove = function(current_empty) {
@@ -184,13 +235,13 @@ if (typeof require !== 'undefined')
         var isFound = false;
         for (var i = 0; i < this.gameStateHistory.length; i++) {
             isFound = true;
-            for (var j = 0; j < this.out.data.length; j++) {
-                /*if (this.gameStateHistory[i][j].v != this.out.data[j].v) {
-                    isFound = false;
-                }*/
+            //for (var j = 0; j < this.out.data.length; j++) {
+            /*if (this.gameStateHistory[i][j].v != this.out.data[j].v) {
+                isFound = false;
+            }*/
 
-               isFound=this.out.isEqual(this.gameStateHistory[i]);
-            }
+            isFound = this.out.isEqual(this.gameStateHistory[i]);
+            //}
 
             if (isFound)
                 return true;
@@ -200,6 +251,7 @@ if (typeof require !== 'undefined')
     };
 
     Lava.prototype.autoPlay = function() {
+        //return;
         while (this.moveHistory.length > 0) {
             var move = this.moveHistory.pop();
 
@@ -230,9 +282,19 @@ if (typeof require !== 'undefined')
         console.log("********End*********");
     }
 
-    Lava.prototype.isGameOver= function()
-    {
+    Lava.prototype.isGameOver = function() {
         return this.out.isEqual(this.input);
+    }
+
+    Lava.prototype.setInput = function(input) {
+        this.input = input;
+    }
+
+    Lava.prototype.reset = function() {
+        this.current_empty = jQuery.extend(true, {}, this.gameBackUp.empty);
+        this.out = jQuery.extend(true, {}, this.gameBackUp.data)
+        this.moveHistory = JSON.parse(JSON.stringify(this.gameBackUp.moveHistory));
+        //this.moveHistory.prototype = this.moveHistoryBackUp.prototype;
     }
 
     //var l = new Lava();

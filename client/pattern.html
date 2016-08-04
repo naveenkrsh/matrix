@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="bower_components/materialize/dist/css/materialize.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="lib/jquery.star-rating/css/star-rating-svg.css" media="screen,projection" />
+    <style type="text/css">
+    .border {
+        border: 1px solid;
+    }
+    
+    .cell {
+        text-align: center;
+        vertical-align: middle border: 1px solid;
+        padding: 0px;
+        font-size: 2vw;
+    }
+    
+    .remove-bottom-margin {
+        /*  // 
+        margin-left:0px;*/
+        margin-bottom: 0px;
+    }
+    
+    .container .row.remove-margin {
+        /*  // margin-bottom: 0px;
+        margin-left:0px;*/
+        margin-left: 0px;
+    }
+    
+    .row.remove-margin-lr {
+        /*  // margin-bottom: 0px;
+        margin-left:0px;*/
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+    
+    .row.remove-margin-lrb {
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+    }
+    /* .container .row.remove-margin {
+        margin-left: 0rem;
+        margin-right: 0rem;
+    }*/
+    
+    .full-width {
+        width: 100%;
+    }
+    
+    .matrix {
+        margin: 0.5rem 0 1rem 0;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .matrix .col {
+        padding: 0px;
+    }
+    </style>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- Page Content goes here -->
+        <div class="row ">
+            <div class="col s12 m9">
+                <div class="row " id="game_container">
+                    <div id="game_grid" class="matrix"></div>
+                </div>
+            </div>
+            <div class="col s12 m3">
+                <ul class=" collection">
+                    <li href="#!" class="collection-item">Best Swap <span class="badge" id="best_swaps"></span></a>
+                    </li>
+                    <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
+                    </li>
+                </ul>
+                <div class="row remove-margin-lr">
+                    <button id="new-game" class="waves-effect waves-light btn full-width red"><i class="material-icons left">replay</i>New Game</button>
+                </div>
+                <div class="row remove-margin-lr ">
+                    <button id="reset" class="waves-effect waves-light btn full-width"><i class="material-icons left">restore</i>Reset</button>
+                </div>
+                <blockquote>
+                    Output
+                </blockquote>
+                <div id="game-final-state-container">
+                    <div id="game-final-state" class="matrix">
+                    </div>
+                </div>
+                <div class="row remove-margin-lrb">
+                    <div class="input-field col s12">
+                        <select id="pattern-options">
+                            <option value="0">Row</option>
+                            <option value="1">Column</option>
+                            <option value="2">Square</option>
+                            <option value="3">Half Square</option>
+                            <option value="4">Chess</option>
+                            <option value="-1" selected>Random</option>
+                        </select>
+                        <label>Pattern Type</label>
+                    </div>
+                </div>
+                <div class="row remove-margin-lrb">
+                    <div class="input-field col s12">
+                        <select id="grid-size">
+                            <option value="3">3</option>
+                            <option value="4" selected>4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                        <label>Grid Size</label>
+                    </div>
+                </div>
+                <!-- div class="row remove-margin-lr">
+                    <button id="game-help" class="waves-effect waves-light btn full-width light-blue"><i class="material-icons left">help_outline</i>Pattern</button>
+                </div> -->
+                <!-- <div id="" class=" ">
+                </div>
+                <div id=""></div> -->
+            </div>
+        </div>
+    </div>
+    <!-- Modal Structure -->
+    <div id="game-help-model" class="modal modal-fixed-footer">
+        <div class="modal-content" id="game-help-model-content">
+            <div id="patten-help-content" class="matrix"></div>
+        </div>
+        <div class="modal-footer row" id="patten-help-footer">
+            <blockquote class="col">
+                Make the following pattern.
+            </blockquote>
+            <p class="col">
+                <input type="checkbox" id="model-permission" />
+                <label for="model-permission">Don't show this message again.</label>
+            </p>
+            <a href="#!" class="col modal-action modal-close waves-effect waves-green btn-flat ">Got It!</a>
+        </div>
+    </div>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
+    <script type="text/javascript" src="lib/jquery.star-rating/jquery.star-rating-svg.js"></script>
+    <script type="text/javascript" src="lib/store.min.js"></script>
+    <script type="text/javascript" src="player.js"></script>
+    <script type="text/javascript" src="Matrix.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+    <script type="text/javascript" src="pattern.js"></script>
+    <script type="text/javascript" src="color.js"></script>
+    <script type="text/javascript">
+    (function() {
+        function PatternGame() {
+            this.player = new Player('Pattern');
+            this.size = this.player.gridSize;
+            this.pattern = [];
+            this.patternType = this.player.patternType;
+            this.fillPattern();
+            this.input = this.getInput();
+            this.game = new Game({
+                game_container: 'game_container',
+                board_id: 'game_grid',
+                best_swaps: 'best_swaps',
+                current_swaps: 'current_swaps',
+                reset: 'reset',
+                new_game: 'new-game'
+            }, this.input, this.size);
+            this.startListening();
+            this.updateUI();
+            this.addPatternHelpModel();
+            this.showPatternModel();
+            this.addPatternHelpOutput();
+
+        }
+        PatternGame.prototype.getInput = function() {
+
+            if (this.patternType == -1) {
+                var randomGame = Math.floor(Math.random() * (this.pattern.length - 1));
+                return this.pattern[randomGame].call(this);
+            } else {
+                return this.pattern[this.patternType].call(this);
+            }
+        };
+
+        PatternGame.prototype.getRowPattern = function() {
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            //console.log(tempColor);
+            var color_size = tempColor.length;
+            //console.log(color_size);
+            //var v = 1;
+            for (var i = 0; i < this.size; i++) {
+                var color_index = Math.floor(Math.random() * (color_size - 1));
+                for (var j = 0; j < this.size; j++) {
+
+                    ma.set(i, j, {
+                        v: i,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                    //v++;
+                }
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+            }
+            return ma;
+        }
+
+        PatternGame.prototype.getColumnPattern = function() {
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            //console.log(tempColor);
+            var color_size = tempColor.length;
+            //console.log(color_size);
+            //var v = 1;
+            for (var i = 0; i < this.size; i++) {
+                var color_index = Math.floor(Math.random() * (color_size - 1));
+                for (var j = 0; j < this.size; j++) {
+
+                    ma.set(j, i, {
+                        v: i,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                    //v++;
+                }
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+            }
+            return ma;
+        };
+
+        PatternGame.prototype.getSquarePattern = function() {
+            var i = 0;
+            var k = 0;
+            var l = 0;
+            var m = this.size;
+            var n = this.size;
+            /*  k - starting row index
+                m - ending row index
+                l - starting column index
+                n - ending column index
+                i - iterator
+            */
+
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            var color_size = tempColor.length;
+
+            var val = 1;
+            while (k < m && l < n) {
+                var color_index = Math.floor(Math.random() * (color_size - 1));
+
+                /* Print the first row from the remaining rows */
+                for (i = l; i < n; ++i) {
+                    // printf("%d ", a[k][i]);
+
+                    ma.set(k, i, {
+                        v: val,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                }
+                k++;
+
+                /* Print the last column from the remaining columns */
+                for (i = k; i < m; ++i) {
+                    //printf("%d ", a[i][n - 1]);
+                    ma.set(i, n - 1, {
+                        v: val,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                }
+                n--;
+
+                /* Print the last row from the remaining rows */
+                if (k < m) {
+                    for (i = n - 1; i >= l; --i) {
+                        //printf("%d ", a[m - 1][i]);
+                        ma.set(m - 1, i, {
+                            v: val,
+                            d: ' ',
+                            c: tempColor[color_index]
+                        });
+                    }
+                    m--;
+                }
+
+                /* Print the first column from the remaining columns */
+                if (l < n) {
+                    for (i = m - 1; i >= k; --i) {
+                        //printf("%d ", a[i][l]);
+                        ma.set(i, l, {
+                            v: val,
+                            d: ' ',
+                            c: tempColor[color_index]
+                        });
+                    }
+                    l++;
+                }
+                val++;
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+            }
+
+            return ma;
+        };
+
+        PatternGame.prototype.getHalfSquarePattern = function() {
+            var i = 0;
+            var k = 0;
+            var l = 0;
+            var m = this.size;
+            var n = this.size;
+            /*  k - starting row index
+                m - ending row index
+                l - starting column index
+                n - ending column index
+                i - iterator
+            */
+
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            var color_size = tempColor.length;
+
+            var val = 1;
+            while (k < m && l < n) {
+                var color_index = Math.floor(Math.random() * (color_size - 1));
+
+                /* Print the first row from the remaining rows */
+                for (i = l; i < n; ++i) {
+                    // printf("%d ", a[k][i]);
+
+                    ma.set(k, i, {
+                        v: val,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                }
+                k++;
+
+                /* Print the last column from the remaining columns */
+                for (i = k; i < m; ++i) {
+                    //printf("%d ", a[i][n - 1]);
+                    ma.set(i, n - 1, {
+                        v: val,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                }
+                n--;
+
+                val++;
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+                color_index = Math.floor(Math.random() * (color_size - 1));
+                /* Print the last row from the remaining rows */
+                if (k < m) {
+                    for (i = n - 1; i >= l; --i) {
+                        //printf("%d ", a[m - 1][i]);
+                        ma.set(m - 1, i, {
+                            v: val,
+                            d: ' ',
+                            c: tempColor[color_index]
+                        });
+                    }
+                    m--;
+                }
+
+                /* Print the first column from the remaining columns */
+                if (l < n) {
+                    for (i = m - 1; i >= k; --i) {
+                        //printf("%d ", a[i][l]);
+                        ma.set(i, l, {
+                            v: val,
+                            d: ' ',
+                            c: tempColor[color_index]
+                        });
+                    }
+                    l++;
+                }
+                val++;
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+            }
+
+            return ma;
+        };
+
+        PatternGame.prototype.getChessPattern = function() {
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            //console.log(tempColor);
+            var color_size = tempColor.length;
+            //console.log(color_size);
+            //var v = 1;
+            var color_index_black = Math.floor(Math.random() * (color_size - 1));
+            var black_color = tempColor[color_index_black];
+            tempColor.splice(color_index_black, 1);
+            color_size = tempColor.length;
+
+            var color_index_white = Math.floor(Math.random() * (color_size - 1));
+            var white_color = tempColor[color_index_white];
+
+            var current;
+            for (var i = 0; i < this.size; i++) {
+                if (i % 2 == 0) {
+                    current = {
+                        color: black_color,
+                        val: 0
+                    };
+                } else {
+                    current = {
+                        color: white_color,
+                        val: 1
+                    };
+                }
+
+
+                for (var j = 0; j < this.size; j++) {
+
+                    ma.set(i, j, {
+                        v: current.val,
+                        d: ' ',
+                        c: current.color
+                    });
+
+                    current = swapColor(current);
+                }
+
+            }
+
+            function swapColor(current) {
+                var obj = {};
+                if (current.color == white_color) {
+                    obj.color = black_color;
+                    obj.val = 0;
+                } else {
+                    obj.color = white_color;
+                    obj.val = 1;
+                }
+
+                return obj;
+            }
+            return ma;
+        }
+        PatternGame.prototype.fillPattern = function() {
+            this.pattern = [];
+            this.pattern.push(this.getRowPattern);
+            this.pattern.push(this.getColumnPattern);
+            this.pattern.push(this.getSquarePattern);
+            this.pattern.push(this.getHalfSquarePattern);
+            this.pattern.push(this.getChessPattern);
+        }
+
+        PatternGame.prototype.startListening = function() {
+            //$("#" + this.elem.reset).click($.proxy(this.reset, this));
+            $("#new-game").click($.proxy(this.newGame, this));
+            $("#" + this.game.gameOverModel.new_game).click($.proxy(this.newGame, this));
+
+            $("#reset").click($.proxy(this.reset, this));
+            $("#" + this.game.gameOverModel.reset_game).click($.proxy(this.reset, this));
+
+            $("#grid-size").change($.proxy(this.gridChange, this));
+            $("#pattern-options").change($.proxy(this.patternChange, this));
+
+            $("#game-help").click($.proxy(this.showPatternModel, this));
+            $("#model-permission").click($.proxy(this.setModelPermission, this));
+
+
+            $(window).on('resize', $.proxy(this.addPatternHelpOutput, this));
+
+
+        };
+
+        PatternGame.prototype.newGame = function() {
+            this.input = this.getInput()
+            this.game.setInput(this.input);
+            this.game.reSuffle();
+            this.showPatternModel();
+            this.addPatternHelpOutput();
+
+        };
+
+        PatternGame.prototype.reset = function() {
+            this.game.reset();
+            this.showPatternModel();
+            this.addPatternHelpOutput();
+        };
+
+        PatternGame.prototype.gridChange = function(ev) {
+
+            this.size = $(ev.target).val();
+            this.input = this.getInput();
+            this.game.gridChange(this.input, this.size);
+            this.player.setGridsize(this.size);
+            this.showPatternModel();
+            this.addPatternHelpOutput();
+
+        };
+
+        PatternGame.prototype.patternChange = function(ev) {
+
+            this.patternType = $(ev.target).val();
+            this.input = this.getInput();
+            this.game.gridChange(this.input, this.size);
+            this.player.setPatternType(this.patternType);
+            this.showPatternModel();
+            this.addPatternHelpOutput();
+
+        };
+
+
+
+        PatternGame.prototype.updateUI = function() {
+            $('#grid-size').val(this.player.gridSize);
+            $("#pattern-options").val(this.player.patternType);
+        };
+
+        PatternGame.prototype.showPatternModel = function() {
+            $('#game-help-model').openModal();
+            this.addPatternHelpModel();
+
+        };
+
+        PatternGame.prototype.addPatternHelpModel = function() {
+            var elem = $('#patten-help-content');
+            this.game.addHtml(elem, this.input, this.getBoxSizeModel());
+
+        }
+
+
+        PatternGame.prototype.showPatternModel = function() {
+            if (this.player.getPatternModel()) {
+                $('#game-help-model').openModal();
+                this.addPatternHelpModel();
+            }
+        };
+
+        PatternGame.prototype.addPatternHelpModel = function() {
+                var elem = $('#patten-help-content');
+                this.game.addHtml(elem, this.input, this.getBoxSizeModel());
+
+            }
+            /*PatternGame.prototype.showPatternModel = function() {
+                $('#game-help-model').openModal();
+                this.addPatternHelpModel();
+            };*/
+
+        PatternGame.prototype.addPatternHelpOutput = function() {
+            var elem = $('#game-final-state');
+            this.game.addHtml(elem, this.input, this.getBoxSizeOutPut());
+
+        }
+        PatternGame.prototype.getBoxSizeModel = function() {
+            var height = document.getElementById('game-help-model-content').offsetHeight;
+            var width = document.getElementById('game-help-model-content').offsetWidth;
+            var footerHeight = document.getElementById('patten-help-footer').offsetHeight;
+            height = height - footerHeight;
+            width = width - 48;
+            // console.log(gameWidth);
+            // console.log(window_height);
+            if (width < height) {
+                return Math.ceil((Math.ceil(width - 10)) / this.size);
+            } else {
+                return Math.ceil((Math.ceil(height) - 20) / this.size);
+            }
+        };
+        PatternGame.prototype.getBoxSizeOutPut = function() {
+            //var height = document.getElementById('game-help-model-content').offsetHeight;
+            var width = document.getElementById('game-final-state-container').offsetWidth;
+            //var footerHeight = document.getElementById('patten-help-footer').offsetHeight;
+            // height = height - footerHeight;
+            // width = width - 48;
+            // console.log(gameWidth);
+            // console.log(window_height);
+            return Math.floor((Math.floor(width - 10)) / this.size);
+            /*if (width < height) { } else { return Math.ceil((Math.ceil(height) - 20) / this.size); }
+             */
+        };
+        PatternGame.prototype.setModelPermission = function(ev) {
+
+            var $this = $(ev.target);
+            // $this will contain a reference to the checkbox   
+            if ($this.is(':checked')) {
+                this.player.setPatternModel(false);
+            } else {
+                // the checkbox was unchecked
+            }
+        }
+
+        new PatternGame();
+
+        $('select').material_select();
+        //
+    })();
+    </script>
+</body>
+
+</html>

@@ -15,10 +15,27 @@
     .cell {
         text-align: center;
         vertical-align: middle border: 1px solid;
+        padding: 0px;
+        font-size: 2vw;
     }
     
     .remove-bottom-margin {
+        /*  // 
+        margin-left:0px;*/
         margin-bottom: 0px;
+    }
+    
+    .container .row.remove-margin {
+        /*  // margin-bottom: 0px;
+        margin-left:0px;*/
+        margin-left: 0px;
+    }
+    
+    .row.remove-margin-lr {
+        /*  // margin-bottom: 0px;
+        margin-left:0px;*/
+        margin-left: 0px;
+        margin-right: 0px;
     }
     /* .container .row.remove-margin {
         margin-left: 0rem;
@@ -28,6 +45,17 @@
     .full-width {
         width: 100%;
     }
+    
+    .matrix {
+        margin: 0.5rem 0 1rem 0;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .matrix .col {
+        padding: 0px;
+    }
     </style>
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -36,24 +64,26 @@
 <body>
     <div class="container">
         <!-- Page Content goes here -->
-        <div class="row remove-margin">
-            <div class="col s12 m9" style="padding:0px">
-                <div id="game_grid" class=""></div>
+        <div class="row ">
+            <div class="col s12 m9">
+                <div class="row " id="game_container">
+                    <div id="game_grid" class="matrix"></div>
+                </div>
             </div>
             <div class="col s12 m3">
-                <ul class="row collection">
+                <ul class=" collection">
                     <li href="#!" class="collection-item">Best Swap <span class="badge" id="best_swaps"></span></a>
                     </li>
                     <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
                     </li>
                 </ul>
-                <div class="row">
+                <div class="row remove-margin-lr">
                     <button id="new-game" class="waves-effect waves-light btn full-width red"><i class="material-icons left">replay</i>New Game</button>
                 </div>
-                <div class="row">
+                <div class="row remove-margin-lr ">
                     <button id="reset" class="waves-effect waves-light btn full-width"><i class="material-icons left">restore</i>Reset</button>
                 </div>
-                <div class="row">
+                <div class="row remove-margin-lr">
                     <div class="input-field col s12">
                         <select id="grid-size">
                             <option value="3">3</option>
@@ -81,6 +111,7 @@
     <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
     <script type="text/javascript" src="lib/jquery.star-rating/jquery.star-rating-svg.js"></script>
     <script type="text/javascript" src="lib/store.min.js"></script>
+    <script type="text/javascript" src="player.js"></script>
     <script type="text/javascript" src="Matrix.js"></script>
     <script type="text/javascript" src="game.js"></script>
     <script type="text/javascript" src="pattern.js"></script>
@@ -88,9 +119,12 @@
     <script type="text/javascript">
     (function() {
         function NumberGame() {
-            this.size = 4;
+            this.player = new Player();
+            this.size = this.player.gridSize;
+
             this.input = this.getInput();
             this.game = new Game({
+                game_container: 'game_container',
                 board_id: 'game_grid',
                 best_swaps: 'best_swaps',
                 current_swaps: 'current_swaps',
@@ -98,6 +132,7 @@
                 new_game: 'new-game'
             }, this.input, this.size);
             this.startListening();
+            this.updateUI();
         }
         NumberGame.prototype.getInput = function() {
             var ma = new Matrix(this.size, this.size);
@@ -124,7 +159,7 @@
             $("#reset").click($.proxy(this.reset, this));
             $("#" + this.game.gameOverModel.reset_game).click($.proxy(this.reset, this));
 
-             $("#grid-size").change($.proxy(this.gridChange, this));
+            $("#grid-size").change($.proxy(this.gridChange, this));
 
         };
 
@@ -142,7 +177,13 @@
 
             this.size = $(ev.target).val();
             this.input = this.getInput();
-            this.game.gridChange(this.input,this.size);
+            this.game.gridChange(this.input, this.size);
+            this.player.setGridsize(this.size);
+
+        };
+
+        NumberGame.prototype.updateUI = function() {
+            $('#grid-size').val(this.player.gridSize);
         };
         new NumberGame();
 

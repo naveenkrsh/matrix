@@ -4,10 +4,37 @@
             alert('Local storage is not supported by your browser.\
             		Please disable "Private Mode", or upgrade to a modern browser.')
             return
+        } else {
+            console.log("store is healthy!!");
         }
-    });
+    })();
 
-    function player() {
-
+    function Player() {
+    	this.gridSize = this.getGridsize();
     }
+    Player.KeyPrefix = "pattern-game-";
+    Player.Key = {
+        SIZE: Player.KeyPrefix + 'size',
+        RATING: Player.KeyPrefix + 'rating',
+        PlAYED: Player.KeyPrefix + 'played'
+    };
+    Player.prototype = {};
+    Player.prototype.setGridsize = function(size) {
+        store.set(Player.Key.SIZE, size);
+    };
+    Player.prototype.getGridsize = function() {
+        var result = store.get(Player.Key.SIZE);
+        if (result) {
+            return result;
+        } else {
+            return 4;
+        }
+    };
+
+
+    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined')
+        module.exports = Player;
+    else
+        window.Player = Player;
+
 })(store);

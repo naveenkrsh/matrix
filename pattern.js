@@ -60,16 +60,15 @@
         var size = this.board.size;
         var box_size = this.getBoxSize();
 
-        //var grid_size = box_size * size;
-        //this.boardElem.css('width',grid_size);
+        var grid_size = box_size * size;
         //console.log(box_size);
         this.boardElem.empty();
         for (var i = 0; i < size; i++) {
-            var str = '<div class="row remove-bottom-margin">'
+            var str = '<div class="row remove-margin remove-bottom-margin">'
 
             for (var j = 0; j < size; j++) {
                 var data = this.board.out.get(i, j);
-                str += '<div class="col s1 center-align cell " id="cell-' + i.toString() + '-' + j.toString() + '" style="background:' + data.c + ';width:' + box_size + 'px;height:' + box_size + 'px;line-height: ' + box_size + 'px;">';
+                str += '<div class="col center-align cell " id="cell-' + i.toString() + '-' + j.toString() + '" style="background:' + data.c + ';width:' + box_size + 'px;height:' + box_size + 'px;line-height: ' + box_size + 'px;">';
                 // str += '<span class="center-align">' + this.board.out.get(i, j).d + '</span>'
                 str += data.d;
                 str += '</div>'
@@ -79,6 +78,8 @@
             this.boardElem.append(str);
         }
         $('#' + this.elem.current_swaps).text(this.current_swap);
+        this.boardElem.css('width', grid_size);
+        this.boardElem.css('height', grid_size);
     };
     Game.gameOverModel = {
         id: "game-over-model",
@@ -194,7 +195,7 @@
     };
     Game.prototype.getBoxSize = function() {
         var window_height = window.innerHeight;
-        var gameWidth = document.getElementById(this.elem.board_id).offsetWidth;
+        var gameWidth = document.getElementById(this.elem.game_container).offsetWidth;
         // console.log(gameWidth);
         // console.log(window_height);
         if (gameWidth < window_height) {
@@ -206,9 +207,9 @@
 
     Game.prototype.autoPlay = function() {
         return;
-        
+
         this.isAuto = true;
-       
+
         var that = this;
         //
         function move() {
@@ -284,8 +285,7 @@
         this.board.setInput(input);
     }
 
-    Game.prototype.gridChange = function(input,size)
-    {
+    Game.prototype.gridChange = function(input, size) {
         this.input = input;
         this.size = size;
         this.board = new Lava(this.input, this.size);

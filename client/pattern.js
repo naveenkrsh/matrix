@@ -234,7 +234,7 @@
     }
 
     Game.prototype.autoPlay = function() {
-        //return;
+        return;
 
         this.isAuto = true;
 

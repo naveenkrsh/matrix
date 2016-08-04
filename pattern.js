@@ -13,7 +13,8 @@
 
         this.gameOverModel = {
             new_game: 'modal-new-game',
-            
+            reset_game: 'modal-reset-game'
+
         }
 
         this.isAuto = false;
@@ -90,7 +91,7 @@
                     </div>\
                     <div class = "modal-footer" >\
                         <button id="modal-new-game" class = " modal-action modal-close waves-effect waves-green btn-flat btn" ><i class="material-icons left">restore</i> New Game </button>\
-                        <button class = " modal-action modal-close waves-effect waves-green btn-flat btn" ><i class="material-icons left">repeat</i> Replay </button>\
+                        <button id="modal-reset-game" class = " modal-action modal-close waves-effect waves-green btn-flat btn" ><i class="material-icons left">repeat</i> Replay </button>\
                     </div>\
                 </div>'
     };
@@ -204,9 +205,10 @@
     }
 
     Game.prototype.autoPlay = function() {
-
+        return;
+        
         this.isAuto = true;
-        //return;
+       
         var that = this;
         //
         function move() {
@@ -282,6 +284,14 @@
         this.board.setInput(input);
     }
 
+    Game.prototype.gridChange = function(input,size)
+    {
+        this.input = input;
+        this.size = size;
+        this.board = new Lava(this.input, this.size);
+        this.drawBoard();
+        this.setBestSwap();
+    }
     Game.prototype.isGameOver = function() {
 
         if (this.board.isGameOver())

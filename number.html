@@ -41,14 +41,35 @@
                 <div id="game_grid" class=""></div>
             </div>
             <div class="col s12 m3">
-                <ul class="collection">
+                <ul class="row collection">
                     <li href="#!" class="collection-item">Best Swap <span class="badge" id="best_swaps"></span></a>
-                        <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
+                    </li>
+                    <li href="#!" class="collection-item">Your Swap <span class="badge" id="current_swaps">0</span></a>
+                    </li>
                 </ul>
-                <button id="new-game" class="waves-effect waves-light btn full-width red"><i class="material-icons left">replay</i>New Game</button>
-                <br>
-                <br>
-                <button id="reset" class="waves-effect waves-light btn full-width"><i class="material-icons left">restore</i>Reset</button>
+                <div class="row">
+                    <button id="new-game" class="waves-effect waves-light btn full-width red"><i class="material-icons left">replay</i>New Game</button>
+                </div>
+                <div class="row">
+                    <button id="reset" class="waves-effect waves-light btn full-width"><i class="material-icons left">restore</i>Reset</button>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <select id="grid-size">
+                            <option value="3">3</option>
+                            <option value="4" selected>4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                        <label>Grid Size</label>
+                    </div>
+                </div>
                 <!-- <div id="" class=" ">
                 </div>
                 <div id=""></div> -->
@@ -59,15 +80,13 @@
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="bower_components/materialize/dist/js/materialize.min.js"></script>
     <script type="text/javascript" src="lib/jquery.star-rating/jquery.star-rating-svg.js"></script>
+    <script type="text/javascript" src="lib/store.min.js"></script>
     <script type="text/javascript" src="Matrix.js"></script>
     <script type="text/javascript" src="game.js"></script>
     <script type="text/javascript" src="pattern.js"></script>
     <script type="text/javascript" src="color.js"></script>
     <script type="text/javascript">
     (function() {
-
-
-
         function NumberGame() {
             this.size = 4;
             this.input = this.getInput();
@@ -78,18 +97,11 @@
                 reset: 'reset',
                 new_game: 'new-game'
             }, this.input, this.size);
-
-
             this.startListening();
-
-            //console.log(this.game);
         }
-
         NumberGame.prototype.getInput = function() {
             var ma = new Matrix(this.size, this.size);
-
             var color_size = COLORS.length;
-
             var v = 1;
             for (var i = 0; i < this.size; i++) {
                 for (var j = 0; j < this.size; j++) {
@@ -102,10 +114,6 @@
                     v++;
                 }
             }
-            //console.log(this.empty);
-            //ma.set(this.size - 1, this.size - 1, this.empty);
-
-            //console.log(ma.data);
             return ma;
         };
         NumberGame.prototype.startListening = function() {
@@ -113,7 +121,11 @@
             $("#new-game").click($.proxy(this.newGame, this));
             $("#" + this.game.gameOverModel.new_game).click($.proxy(this.newGame, this));
 
-             $("#reset").click($.proxy(this.reset, this));
+            $("#reset").click($.proxy(this.reset, this));
+            $("#" + this.game.gameOverModel.reset_game).click($.proxy(this.reset, this));
+
+             $("#grid-size").change($.proxy(this.gridChange, this));
+
         };
 
         NumberGame.prototype.newGame = function() {
@@ -125,8 +137,16 @@
         NumberGame.prototype.reset = function() {
             this.game.reset();
         };
+
+        NumberGame.prototype.gridChange = function(ev) {
+
+            this.size = $(ev.target).val();
+            this.input = this.getInput();
+            this.game.gridChange(this.input,this.size);
+        };
         new NumberGame();
 
+        $('select').material_select();
     })();
     </script>
 </body>

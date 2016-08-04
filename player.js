@@ -9,7 +9,8 @@
         }
     })();
 
-    function Player() {
+    function Player(type) {
+        this.type = type;
     	this.gridSize = this.getGridsize();
     }
     Player.KeyPrefix = "pattern-game-";
@@ -20,10 +21,10 @@
     };
     Player.prototype = {};
     Player.prototype.setGridsize = function(size) {
-        store.set(Player.Key.SIZE, size);
+        store.set(Player.Key.SIZE+'-'+this.type, size);
     };
     Player.prototype.getGridsize = function() {
-        var result = store.get(Player.Key.SIZE);
+        var result = store.get(Player.Key.SIZE+'-'+this.type);
         if (result) {
             return result;
         } else {

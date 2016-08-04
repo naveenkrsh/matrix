@@ -100,10 +100,23 @@
                         <label>Grid Size</label>
                     </div>
                 </div>
+                <div class="row remove-margin-lr">
+                    <button id="game-help" class="waves-effect waves-light btn full-width light-blue"><i class="material-icons left">help_outline</i>Pattern</button>
+                </div>
                 <!-- <div id="" class=" ">
                 </div>
                 <div id=""></div> -->
             </div>
+        </div>
+    </div>
+    <!-- Modal Structure -->
+    <div id="game-help-model" class="modal modal-fixed-footer">
+        <div class="modal-content" id="game-help-model-content">
+            
+            <div id="patten-help-content" class="matrix"></div>
+        </div>
+        <div class="modal-footer" id="patten-help-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Got It!</a>
         </div>
     </div>
     <!--Import jQuery before materialize.js-->
@@ -118,10 +131,9 @@
     <script type="text/javascript" src="color.js"></script>
     <script type="text/javascript">
     (function() {
-        function NumberGame() {
-            this.player = new Player('Number');
+        function PatternGame() {
+            this.player = new Player('Pattern');
             this.size = this.player.gridSize;
-
             this.input = this.getInput();
             this.game = new Game({
                 game_container: 'game_container',
@@ -133,13 +145,16 @@
             }, this.input, this.size);
             this.startListening();
             this.updateUI();
+            this.addPatternHelp();
+            this.showPattern();
+
         }
-        NumberGame.prototype.getInput = function() {
-            var ma = new Matrix(this.size, this.size);
+        PatternGame.prototype.getInput = function() {
+            /*var ma = new Matrix(this.size, this.size);
             var tempColor = JSON.parse(JSON.stringify(COLORS));
-           // console.log(tempColor);
+            console.log(tempColor);
             var color_size = tempColor.length;
-           // console.log(color_size);
+            console.log(color_size);
             var v = 1;
             for (var i = 0; i < this.size; i++) {
                 for (var j = 0; j < this.size; j++) {
@@ -152,13 +167,38 @@
                     v++;
                     tempColor.splice(color_index, 1);
                     color_size = tempColor.length;
-                    //console.log(color_size);
+                    console.log(color_size);
                 }
             }
-            return ma;
+            return ma;*/
+            return this.getRowPattern()
         };
 
-        NumberGame.prototype.startListening = function() {
+        PatternGame.prototype.getRowPattern = function() {
+            var ma = new Matrix(this.size, this.size);
+            var tempColor = JSON.parse(JSON.stringify(COLORS));
+            //console.log(tempColor);
+            var color_size = tempColor.length;
+            //console.log(color_size);
+            //var v = 1;
+            for (var i = 0; i < this.size; i++) {
+                var color_index = Math.floor(Math.random() * (color_size - 1));
+                for (var j = 0; j < this.size; j++) {
+
+                    ma.set(i, j, {
+                        v: i,
+                        d: ' ',
+                        c: tempColor[color_index]
+                    });
+                    //v++;
+                }
+                tempColor.splice(color_index, 1);
+                color_size = tempColor.length;
+            }
+            return ma;
+        }
+
+        PatternGame.prototype.startListening = function() {
             //$("#" + this.elem.reset).click($.proxy(this.reset, this));
             $("#new-game").click($.proxy(this.newGame, this));
             $("#" + this.game.gameOverModel.new_game).click($.proxy(this.newGame, this));
@@ -168,32 +208,63 @@
 
             $("#grid-size").change($.proxy(this.gridChange, this));
 
+            $("#game-help").click($.proxy(this.showPattern, this));
+
         };
 
-        NumberGame.prototype.newGame = function() {
-            this.game.setInput(this.getInput());
+        PatternGame.prototype.newGame = function() {
+            this.input = this.getInput()
+            this.game.setInput(this.input);
             this.game.reSuffle();
 
         };
 
-        NumberGame.prototype.reset = function() {
+        PatternGame.prototype.reset = function() {
             this.game.reset();
         };
 
-        NumberGame.prototype.gridChange = function(ev) {
+        PatternGame.prototype.gridChange = function(ev) {
 
             this.size = $(ev.target).val();
             this.input = this.getInput();
             this.game.gridChange(this.input, this.size);
             this.player.setGridsize(this.size);
+
         };
 
-        NumberGame.prototype.updateUI = function() {
+        PatternGame.prototype.updateUI = function() {
             $('#grid-size').val(this.player.gridSize);
         };
-        new NumberGame();
+
+        PatternGame.prototype.showPattern = function() {
+            $('#game-help-model').openModal();
+            this.addPatternHelp();
+        };
+
+        PatternGame.prototype.addPatternHelp = function() {
+            var elem = $('#patten-help-content');
+            this.game.addHtml(elem, this.input, this.getBoxSize());
+
+        }
+        PatternGame.prototype.getBoxSize = function() {
+            var height = document.getElementById('game-help-model-content').offsetHeight;
+            var width = document.getElementById('game-help-model-content').offsetWidth;
+            var footerHeight = document.getElementById('patten-help-footer').offsetHeight;
+            height = height - footerHeight;
+            width=width-48;
+            // console.log(gameWidth);
+            // console.log(window_height);
+            if (width < height) {
+                return Math.ceil((Math.ceil(width - 10)) / this.size);
+            } else {
+                return Math.ceil((Math.ceil(height) - 20) / this.size);
+            }
+        };
+
+        new PatternGame();
 
         $('select').material_select();
+        //
     })();
     </script>
 </body>

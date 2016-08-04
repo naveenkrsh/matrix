@@ -57,17 +57,46 @@
         $('#' + this.elem.best_swaps).text(this.board.minimum_swap);
     }
     Game.prototype.drawBoard = function() {
-        var size = this.board.size;
-        var box_size = this.getBoxSize();
 
+        /* var size = this.board.size;
+         var box_size = this.getBoxSize();
+
+         var grid_size = box_size * size;
+         //console.log(box_size);
+         this.boardElem.empty();
+         for (var i = 0; i < size; i++) {
+             var str = '<div class="row remove-margin remove-bottom-margin">'
+
+             for (var j = 0; j < size; j++) {
+                 var data = this.board.out.get(i, j);
+                 str += '<div class="col center-align cell " id="cell-' + i.toString() + '-' + j.toString() + '" style="background:' + data.c + ';width:' + box_size + 'px;height:' + box_size + 'px;line-height: ' + box_size + 'px;">';
+                 // str += '<span class="center-align">' + this.board.out.get(i, j).d + '</span>'
+                 str += data.d;
+                 str += '</div>'
+             }
+             str += '</div>';
+
+             this.boardElem.append(str);
+         }
+         this.boardElem.css('width', grid_size);
+         this.boardElem.css('height', grid_size);*/
+        var box_size = this.getBoxSize();
+        this.addHtml(this.boardElem, this.board.out, box_size);
+        $('#' + this.elem.current_swaps).text(this.current_swap);
+
+    };
+
+    Game.prototype.addHtml = function(elem, matrix, box_size) {
+
+        var size = this.board.size;
         var grid_size = box_size * size;
         //console.log(box_size);
-        this.boardElem.empty();
+        elem.empty();
         for (var i = 0; i < size; i++) {
             var str = '<div class="row remove-margin remove-bottom-margin">'
 
             for (var j = 0; j < size; j++) {
-                var data = this.board.out.get(i, j);
+                var data = matrix.get(i, j);
                 str += '<div class="col center-align cell " id="cell-' + i.toString() + '-' + j.toString() + '" style="background:' + data.c + ';width:' + box_size + 'px;height:' + box_size + 'px;line-height: ' + box_size + 'px;">';
                 // str += '<span class="center-align">' + this.board.out.get(i, j).d + '</span>'
                 str += data.d;
@@ -75,12 +104,11 @@
             }
             str += '</div>';
 
-            this.boardElem.append(str);
+            elem.append(str);
         }
-        $('#' + this.elem.current_swaps).text(this.current_swap);
-        this.boardElem.css('width', grid_size);
-        this.boardElem.css('height', grid_size);
-    };
+        elem.css('width', grid_size+2);
+        elem.css('height', grid_size+2);
+    }
     Game.gameOverModel = {
         id: "game-over-model",
         html: '<!-- Modal Structure -->\
@@ -199,7 +227,7 @@
         // console.log(gameWidth);
         // console.log(window_height);
         if (gameWidth < window_height) {
-            return Math.ceil((Math.ceil(gameWidth)) / this.board.size);
+            return Math.ceil((Math.ceil(gameWidth - 10)) / this.board.size);
         } else {
             return Math.ceil((Math.ceil(window_height) - 20) / this.board.size);
         }

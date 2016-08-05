@@ -9,16 +9,16 @@
 
 ### How do I get set up? ###
 
-A) By Running Node Server
+**A) By Running Node Server**
 
-**1.install node js**
+    1.install node js
 
-**2.Run following cmd**
+    2.Run following cmd
 
-    $npm install
+        $npm install
 
-    $npm start
+        $npm start
 
-B) By opening client folder
+**B) By opening client folder**
 
     1.open index.html in browser     

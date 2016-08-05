@@ -288,6 +288,9 @@
         if (point > 4.5 && point < 5)
             return 4.5;
 
+        if (point > 5)
+            return 5;
+
         return point;
     }
 

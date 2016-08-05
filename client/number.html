@@ -137,9 +137,9 @@
         NumberGame.prototype.getInput = function() {
             var ma = new Matrix(this.size, this.size);
             var tempColor = JSON.parse(JSON.stringify(COLORS));
-           // console.log(tempColor);
+            // console.log(tempColor);
             var color_size = tempColor.length;
-           // console.log(color_size);
+            // console.log(color_size);
             var v = 1;
             for (var i = 0; i < this.size; i++) {
                 for (var j = 0; j < this.size; j++) {
@@ -195,6 +195,22 @@
 
         $('select').material_select();
     })();
+    </script>
+    <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-82048314-1', 'auto');
+    ga('send', 'pageview');
     </script>
 </body>
 

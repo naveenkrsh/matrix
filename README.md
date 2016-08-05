@@ -10,10 +10,14 @@
 ### How do I get set up? ###
 
 A) By Running Node Server
-*1.install node js
-*2.Run following cmd
-    *$npm install
-    *$npm start
+
+**1.install node js **
+**2.Run following cmd **
+
+    $npm install
+
+    $npm start
 
 B) By opening client folder
-    *1.open index.html in browser     
+
+    1.open index.html in browser     

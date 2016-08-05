@@ -11,8 +11,9 @@
 
 A) By Running Node Server
 
-**1.install node js **
-**2.Run following cmd **
+**1.install node js**
+
+**2.Run following cmd**
 
     $npm install
 

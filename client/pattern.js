@@ -106,8 +106,8 @@
 
             elem.append(str);
         }
-        elem.css('width', grid_size+2);
-        elem.css('height', grid_size+2);
+        elem.css('width', grid_size + 2);
+        elem.css('height', grid_size + 2);
     }
     Game.gameOverModel = {
         id: "game-over-model",
@@ -234,10 +234,9 @@
     }
 
     Game.prototype.autoPlay = function() {
+
         return;
-
         this.isAuto = true;
-
         var that = this;
         //
         function move() {
@@ -268,7 +267,7 @@
     Game.prototype.gameOver = function() {
 
         $(".my-rating").starRating({
-            initialRating: 4.2,
+            initialRating: this.getPoint(),
             readOnly: true,
             starSize: 25
         });
@@ -277,20 +276,18 @@
         });
     }
 
-    Game.prototype.getPoint = function(){
+    Game.prototype.getPoint = function() {
 
-        var scale = this.current_swap/this.minimum_swap;
+        var scale = this.current_swap / this.board.minimum_swap;
 
         var point = 6 - scale;
 
-        if(point==1)
-            return 5;
-        if(point<0)
+        if (point < 0)
             return 1;
 
-        if(point > 4.5 && point < 5)
+        if (point > 4.5 && point < 5)
             return 4.5;
-        
+
         return point;
     }
 

@@ -277,6 +277,22 @@
         });
     }
 
+    Game.prototype.getPoint = function(){
+
+        var scale = this.current_swap/this.minimum_swap;
+
+        var point = 6 - scale;
+
+        if(point==1)
+            return 5;
+        if(point<0)
+            return 1;
+
+        if(point > 4.5 && point < 5)
+            return 4.5;
+        
+        return point;
+    }
 
 
     Game.prototype.reSuffle = function() {
